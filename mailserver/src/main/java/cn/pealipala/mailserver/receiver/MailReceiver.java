@@ -36,12 +36,13 @@ public class MailReceiver {
 
     @RabbitListener(queues = "mail")
     public void handle(Employee employee){
+        logger.info(employee.toString());
         //收到消息 发送邮件
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
         try {
             mimeMessageHelper.setTo(employee.getEmail());
-            mimeMessageHelper.setFrom(mailProperties.getPassword());
+            mimeMessageHelper.setFrom(mailProperties.getUsername());
             mimeMessageHelper.setSubject("入职欢迎");
             mimeMessageHelper.setSentDate(new Date());
             Context context = new Context();

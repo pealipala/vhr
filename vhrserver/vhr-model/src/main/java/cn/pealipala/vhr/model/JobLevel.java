@@ -2,9 +2,10 @@ package cn.pealipala.vhr.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class JobLevel {
+public class JobLevel implements Serializable {
     private Integer id;
 
     private String name;

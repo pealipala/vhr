@@ -1,6 +1,8 @@
 package cn.pealipala.vhr.model;
 
-public class Nation {
+import java.io.Serializable;
+
+public class Nation implements Serializable {
     private Integer id;
 
     private String name;

@@ -3,6 +3,9 @@ package cn.pealipala.vhr.service;
 import cn.pealipala.vhr.mapper.EmployeeMapper;
 import cn.pealipala.vhr.model.Employee;
 import cn.pealipala.vhr.model.RespPageBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +21,11 @@ import java.util.List;
  */
 @Service
 public class EmployeeService {
+    public final static Logger logger= LoggerFactory.getLogger(EmployeeService.class);
     @Autowired
     private EmployeeMapper employeeMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
     SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
     DecimalFormat decimalFormat = new DecimalFormat("##.00");
@@ -43,7 +49,13 @@ public class EmployeeService {
         double month = (Double.parseDouble(yearFormat.format(endcontract)) - Double.parseDouble(yearFormat.format(begincontract))) * 12
                 + (Double.parseDouble(monthFormat.format(endcontract)) - Double.parseDouble(monthFormat.format(begincontract)));
         employee.setContractterm(Double.parseDouble(decimalFormat.format(month/12)));
-        return employeeMapper.insertSelective(employee);
+        Integer result = employeeMapper.insertSelective(employee);
+        if (result==1){
+            Employee employee1 = employeeMapper.getEmployeeById(employee.getId());
+            logger.info(employee1.toString());
+            rabbitTemplate.convertAndSend("mail",employee1);
+        }
+        return result;
     }
 
     public Integer getMaxWorkID() {
